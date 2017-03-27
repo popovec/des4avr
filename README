@@ -1,0 +1,84 @@
+DES implementation for AVR
+==========================
+
+C and ASM implementation of Data Encryption Standard algorithm.
+
+Description:
+============
+
+DES cipher implementation for 8 bit AVR (attiny/atmega)
+Small, 800 bytes of code. Fast, below 49900 clock cycles.
+
+Example test code for ARDUINO UNO included
+
+
+Compilation and testing
+=======================
+
+Compiling and testing (tested only on linux):
+
+1. you need gcc, gcc-avr, make, avrdude, openssl, hexdump 
+
+   On debian based system please install:
+
+   apt-get install avrdude gcc-avr avr-libc make openssl bsdmainutils
+
+2. Connect ARDUINO UNO to USB port on computer.
+
+3. Then run "make" to compile and get help about targets in Makefile.
+
+4. Upload test code to arduino:
+
+   make arduino_des_asm_program
+
+5. run test:
+
+   make AVR_TEST
+
+It may not run as root, use sudo. The test can be run without root access,
+but you must set the access permissions for ARDUINO serial port
+
+
+Specific for this implementation
+================================
+
+Code is designed to be small, with minimal RAM usage, only 15 or 16 bytes 
+in stack, (depends on PC size), + 18 bytes in stack if C ABI is needed).
+Flash size: 800 bytes (inclusive C ABI). Speed below 49900 clock cycles
+for encrypt or decrypt 8 bytes in ECB mode. (C version about 177300 clock
+cycles, size 1282 bytes)
+
+Code is modified, does not use standard permutations as described by DES
+original (NIST) description.
+
+Message expansion (E), Permuted choice 1 (PC-1) and Permuted choice 2
+(PC-2) are merged into one 56 bit long message expansion.  This expanded
+message is directly XORed by plain key.  S-box addresses are selected
+from result of XOR operation by table.  S-boxes are merged to one table 
+(256 bytes).
+
+Initial and inverse initial permutation is done by procedures. Key
+expansion is in procedure too. Only permutation (P) is unchanged.
+
+Permutation tables are converted to get fast implementation on AVR. 
+(SHIFT instruction to rotate 4 bits in one step).
+
+
+Literature:
+===========
+
+https://en.wikipedia.org/wiki/Data_Encryption_Standard
+
+https://en.wikipedia.org/wiki/DES_supplementary_material
+
+https://github.com/tarequeh/DES
+
+https://en.wikipedia.org/wiki/Triple_DES
+
+https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
+
+
+Your can foud more details about DES on AVR (inclusive Atmel DES bootloader) 
+in ATMEL application notes:
+
+http://www.atmel.com/images/doc2541.pdf 
